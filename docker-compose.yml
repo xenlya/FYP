@@ -1,0 +1,19 @@
+services:
+  nextjs:
+    image: node:22-alpine
+    container_name: nextjs-dev
+
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+
+    working_dir: /app
+
+    volumes:
+      - ./app:/app
+
+    ports:
+      - "3000:3000"
+
+    stdin_open: true
+    tty: true
