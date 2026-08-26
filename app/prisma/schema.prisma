@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Environment {
+  DEVELOPMENT
+  TESTING
+  STAGING
+  PRODUCTION
+}
+
+model DatabaseInstance {
+  id           Int         @id @default(autoincrement())
+  name         String      @unique
+
+  host         String      @default("postgres")
+  port         Int         @default(5432)
+
+  databaseName String
+  username     String
+  password     String
+
+  environment  Environment
+
+  isConnected  Boolean     @default(false)
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  snapshots    Snapshot[]
+}
+
+model Snapshot {
+  id                 Int              @id @default(autoincrement())
+  databaseInstanceId Int
+  version            Int
+  message            String?
+  createdBy          String?
+  createdAt          DateTime         @default(now())
+
+  databaseInstance   DatabaseInstance @relation(fields: [databaseInstanceId], references: [id], onDelete: Cascade)
+
+  content            SnapshotContent?
+
+  @@unique([databaseInstanceId, version])
+}
+
+model SnapshotContent {
+  id         Int      @id @default(autoincrement())
+  snapshotId Int      @unique
+  schemaJson Json
+
+  snapshot   Snapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+}

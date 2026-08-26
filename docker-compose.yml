@@ -1,4 +1,5 @@
 services:
+
   nextjs:
     image: node:22-alpine
     container_name: nextjs-dev
@@ -14,6 +15,32 @@ services:
 
     ports:
       - "3000:3000"
+      - "9229:9229"
+      - "5555:5555"
+      - "51212:51212"
 
     stdin_open: true
     tty: true
+
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    container_name: postgres-db
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: schema_versioning
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
